@@ -22,17 +22,18 @@ jobs:
       - name: Install Dependencies
         run: pip install requests
 
-      - name: Run EPG Scraper
+      - name: Run Scraper
         run: python main.py
 
-      - name: Commit and Push Changes
+      - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
           if [ -s rlaxx_playlist.m3u ]; then
             git add rlaxx_playlist.m3u rlaxx_guide.xml
-            git commit -m "Automated EPG Update [skip ci]" || echo "No changes to commit"
+            git commit -m "Update EPG Data [skip ci]" || echo "No changes"
             git push
           else
-            echo "Skipping commit: API blocked or files empty."
+            echo "API block detected. Files not generated."
+            exit 0
           fi
