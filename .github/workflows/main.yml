@@ -9,7 +9,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # Crucial for the bot to push changes
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -21,11 +21,11 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
-          # Only push if the files actually exist
-          if [ -f rlaxx_playlist.m3u ]; then
+          # Only commit if files exist and are not empty
+          if [ -s rlaxx_playlist.m3u ]; then
             git add rlaxx_playlist.m3u rlaxx_guide.xml
-            git commit -m "Auto-update EPG [skip ci]" || echo "No changes"
+            git commit -m "Update EPG Data [skip ci]" || echo "No changes to commit"
             git push
           else
-            echo "Files were not generated due to 403 error. Skipping commit."
+            echo "Skipping commit: Files are missing or empty due to API block."
           fi
