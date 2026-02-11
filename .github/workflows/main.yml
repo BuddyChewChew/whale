@@ -2,30 +2,38 @@ name: Update Rlaxx Guide
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *'  # Runs automatically every 6 hours
+  workflow_dispatch:      # Allows manual triggering
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Crucial for the bot to push changes
+      [cite_start]contents: write  # Allows the action to commit files back to your repo [cite: 17]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - run: pip install requests
-      - run: python main.py
-      - name: Commit and Push
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run EPG Scraper
+        run: python main.py
+
+      - name: Commit and Push Changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
-          # Only commit if files exist and are not empty
+          # Only commit if the M3U file exists and is not empty 
           if [ -s rlaxx_playlist.m3u ]; then
             git add rlaxx_playlist.m3u rlaxx_guide.xml
-            git commit -m "Update EPG Data [skip ci]" || echo "No changes to commit"
+            git commit -m "Automated EPG Update [skip ci]" || echo "No changes to commit"
             git push
           else
-            echo "Skipping commit: Files are missing or empty due to API block."
+            echo "Skipping commit: API blocked or files empty."
           fi
