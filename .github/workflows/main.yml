@@ -1,5 +1,4 @@
 name: Update Rlaxx Guide
-
 on:
   schedule:
     - cron: '0 */6 * * *'
@@ -11,24 +10,19 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run script
-        run: python main.py
-
+      - run: pip install requests
+      - run: python main.py
       - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add rlaxx_playlist.m3u rlaxx_guide.xml
-          git commit -m "Update EPG Data" || exit 0
-          git push
+          # Only add if files exist to avoid "pathspec" errors
+          if [ -f rlaxx_playlist.m3u ]; then
+            git add rlaxx_playlist.m3u rlaxx_guide.xml
+            git commit -m "Update EPG [skip ci]" || echo "No changes to commit"
+            git push
+          fi
