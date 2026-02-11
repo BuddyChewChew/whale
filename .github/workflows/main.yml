@@ -1,4 +1,5 @@
 name: Update Rlaxx Guide
+
 on:
   schedule:
     - cron: '0 */6 * * *'
@@ -19,10 +20,12 @@ jobs:
       - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          # Only add if files exist to avoid "pathspec" errors
+          git config --local user.name "GitHub Action Bot"
+          # Only push if the files actually exist
           if [ -f rlaxx_playlist.m3u ]; then
             git add rlaxx_playlist.m3u rlaxx_guide.xml
-            git commit -m "Update EPG [skip ci]" || echo "No changes to commit"
+            git commit -m "Auto-update EPG [skip ci]" || echo "No changes"
             git push
+          else
+            echo "Files were not generated due to 403 error. Skipping commit."
           fi
