@@ -2,14 +2,14 @@ name: Update Rlaxx Guide
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Runs automatically every 6 hours
-  workflow_dispatch:      # Allows manual triggering
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      [cite_start]contents: write  # Allows the action to commit files back to your repo [cite: 17]
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +29,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
-          # Only commit if the M3U file exists and is not empty 
           if [ -s rlaxx_playlist.m3u ]; then
             git add rlaxx_playlist.m3u rlaxx_guide.xml
             git commit -m "Automated EPG Update [skip ci]" || echo "No changes to commit"
